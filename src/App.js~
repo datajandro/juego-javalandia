@@ -1,0 +1,14 @@
+import './App.css';
+import Grid from './Grid';
+
+function App() {
+  return (
+    <div className="App">
+      <Grid />
+      <p>Haz clic en los cuadros rojos con amarillo.</p>
+      <p>Luego usa las flechas derecha e izquierda para moverte</p>
+    </div>
+  );
+}
+
+export default App;

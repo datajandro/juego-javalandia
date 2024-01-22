@@ -1,0 +1,37 @@
+/*GRID*/
+
+.grid {
+    display: grid;
+    justify-items: stretch;
+    height: 100svh;
+    grid-template-rows: auto 1fr;
+}
+
+.gridElement {
+    width: auto;
+}
+
+/*PERSONAJE*/
+
+.Personaje-img {
+    background-color: transparent;
+    width: 100%;
+}
+
+/*ATAQUE ENEMIGO*/
+
+.ataqueEnemigoImg {
+    transform: rotate(0.75turn);
+    position: relative;
+    top: 100%;
+    animation-name: ataqueEnemigoUp;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+}
+
+@keyframes ataqueEnemigoUp {
+    0%   {top: 100%;}
+    100% {top: 0%;}
+}
+
+/*BUTTON*/

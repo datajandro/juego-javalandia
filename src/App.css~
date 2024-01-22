@@ -1,0 +1,28 @@
+/*GRID*/
+
+.grid {
+    border: 10px black solid;
+    display: grid;
+    justify-items: stretch;
+    height: 100svh;
+}
+
+.gridElement {
+    background-color: red;
+    /*height: 30vw;*/
+    border: 1px yellow solid;
+}
+
+/*PERSONAJE*/
+
+.Personaje-img {
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+}
+
+/*ATAQUE ENEMIGO*/
+
+.ataqueEnemigoImg {
+    transform: rotate(0.75turn);
+}
