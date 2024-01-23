@@ -1,6 +1,6 @@
 import Personaje from './Personaje';
 import AtaqueEnemigo from './Enemigo';
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function GridElementPersonaje({ personajeOnOff }) {
     return (
@@ -99,35 +99,75 @@ function Grid() {
     1 = Juego Iniciado
     */
 
-    const [timerAtaqueEnemigo, setTimerAtaqueEnemigo] = useState(0)  
+    const [timerAtaqueEnemigo, setTimerAtaqueEnemigo] = useState(0);
+
+    let intervalTimerAtaqueEnemigo;
     
-    const [prueba, setPrueba] = useState(0);
-    
-    let interval = setInterval(() => {
-        setPrueba(prueba++);
-        console.log(prueba);
-    }, 1000);
+    const [timerAtaqueEnemigoDuration, setTimerAtaqueEnemigoDuration] = useState(1000);
+
+    useEffect(() => {
+        if (timerAtaqueEnemigo === 1) {
+            intervalTimerAtaqueEnemigo = setInterval(() => {
+                setAtaqueEnemigoOn(<AtaqueEnemigo 
+                    display={"inline"} 
+                    animationName={"ataqueEnemigoUp"}
+                    animationDuration={`${timerAtaqueEnemigoDuration}ms`} />);
+                setGridElementAirAtaqueEnemigoPosition(
+                    getRandomInt(gridTemplateColumnsNumber)
+                );
+            }, timerAtaqueEnemigoDuration);
+            return () => clearInterval(intervalTimerAtaqueEnemigo);
+        }
+    })
+
+    let timeoutAtaqueEnemigo;
+
+    useEffect(() => {
+        if (gridElementAirAtaqueEnemigoPosition === gridElementPersonajePosition) {
+            console.log("flecha en posición");
+
+            timeoutAtaqueEnemigo = setTimeout(() => {
+                if (gridElementAirAtaqueEnemigoPosition === gridElementPersonajePosition) {
+                    console.log("flecha ha impactado");
+                    stopGame();
+                }
+            }, timerAtaqueEnemigoDuration);
+        }
+        return () => clearTimeout(timeoutAtaqueEnemigo);
+
+    }, [gridElementPersonajePosition, gridElementAirAtaqueEnemigoPosition])
+
+    const gameStartRef = useRef(null)
 
     function startGame() {
+        gameStartRef.current.focus()
         setTimerAtaqueEnemigo(1);
-        setAtaqueEnemigoOn(<AtaqueEnemigo display={"inline"} />);
+        console.log("start");
     }
 
     function stopGame() {
         setTimerAtaqueEnemigo(0)
         setAtaqueEnemigoOn(<AtaqueEnemigo display={"none"} />);
+        setGridElementAirAtaqueEnemigoPosition(null)
+        console.log("stop");
     }
 
     return (
-        <div 
-            className="grid" 
-            style={{gridTemplateColumns: gridTemplateColumnsString()}}
-            tabIndex={0}
-            onKeyDown={handleKeyDown} >
-            {gridElementPersonajeArray}
-            {gridElementAirArray}
-            <button onClick={startGame}>PLAY</button>
-            <button onClick={stopGame}>STOP</button>
+        <div id='containerOfGrid'>
+            { 
+                timerAtaqueEnemigo === 0 ? 
+                    <button onClick={startGame} id='playButton' className='fullScreen'>PLAY</button> 
+                : null 
+            }
+            <div 
+                className="grid" 
+                style={{gridTemplateColumns: gridTemplateColumnsString()}}
+                tabIndex={0}
+                onKeyDown={handleKeyDown}
+                ref={gameStartRef} >
+                    {gridElementPersonajeArray}
+                    {gridElementAirArray}
+            </div>
         </div>
     )
 }

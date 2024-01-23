@@ -4,7 +4,7 @@
     display: grid;
     justify-items: stretch;
     height: 100svh;
-    grid-template-rows: 2fr 2fr 1fr;
+    grid-template-rows: 1fr 3fr;
 }
 
 .gridElement {
@@ -15,23 +15,39 @@
 
 .Personaje-img {
     background-color: transparent;
-    width: 100%;
+    width: 25svh;
+    display: block;
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /*ATAQUE ENEMIGO*/
 
 .ataqueEnemigoImg {
+    background: red;
+    border-radius: 0 50% 50% 0;
+    opacity: 0.1;
+    width: 100%;
     transform: rotate(0.75turn);
     position: relative;
-    top: 100%;
-    animation-name: ataqueEnemigoUp;
-    animation-duration: 1000ms;
-    animation-iteration-count: infinite;
+    top: 0%;
+    animation-iteration-count: 1;
 }
 
 @keyframes ataqueEnemigoUp {
-    0%   {top: 100%;}
-    100% {top: 0%;}
+    0%   {top: 100%; background: transparent; opacity: 1.0;}
+    50%  {background: transparent;}
+    90%  {opacity: 1.0;}
+    100% {top: 0%; background: rgba(255, 0, 0, 0.5); opacity: 0.1;}
+}
+
+/*FULL SCREEN CLASS*/
+
+.fullScreen {
+    width: 100svw;
+    height: 100svh;
 }
 
 /*BUTTON*/
+
