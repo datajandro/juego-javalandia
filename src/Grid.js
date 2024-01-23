@@ -29,8 +29,8 @@ function Grid() {
     const personajeOn = <Personaje />;
     let personajeOff = null;
 
-    const [ataqueEnemigoOn, setAtaqueEnemigoOn] = useState(<AtaqueEnemigo display={"none"} />);
     let ataqueEnemigoOff = null;
+    const [ataqueEnemigoOn, setAtaqueEnemigoOn] = useState(ataqueEnemigoOff);
 
     /*Generador de numeros aleatorios con un tope maximo*/
 
@@ -45,7 +45,7 @@ function Grid() {
         setGridElementPersonajePosition] = useState(0);
     const [
         gridElementAirAtaqueEnemigoPosition, 
-        setGridElementAirAtaqueEnemigoPosition] = useState(getRandomInt(gridTemplateColumnsNumber))
+        setGridElementAirAtaqueEnemigoPosition] = useState(null)
 
     /*Movimiento del personaje con las flechas del teclado*/
 
@@ -93,20 +93,29 @@ function Grid() {
         return array.join(' ')
     }
 
+    /* CODIGOS DE TIMER ATAQUE ENEMIGO*/
+    /*
+    0 = Juego sin iniciar
+    1 = Juego Iniciado
+    */
+
+    const [timerAtaqueEnemigo, setTimerAtaqueEnemigo] = useState(0)  
+    
+    const [prueba, setPrueba] = useState(0);
+    
+    let interval = setInterval(() => {
+        setPrueba(prueba++);
+        console.log(prueba);
+    }, 1000);
+
     function startGame() {
-        window.setInterval(() => {
-            setGridElementAirAtaqueEnemigoPosition(getRandomInt(gridTemplateColumnsNumber));
-        }, 1000);
-        setAtaqueEnemigoOn(<AtaqueEnemigo display={"inline"} />)
+        setTimerAtaqueEnemigo(1);
+        setAtaqueEnemigoOn(<AtaqueEnemigo display={"inline"} />);
     }
 
-    var variable = 0;
-
-    if (gridElementPersonajePosition === gridElementAirAtaqueEnemigoPosition) {
-        window.setTimeout(() => {
-            variable++
-            console.log(`perdiste ${variable}`);
-        }, 1000)
+    function stopGame() {
+        setTimerAtaqueEnemigo(0)
+        setAtaqueEnemigoOn(<AtaqueEnemigo display={"none"} />);
     }
 
     return (
@@ -118,6 +127,7 @@ function Grid() {
             {gridElementPersonajeArray}
             {gridElementAirArray}
             <button onClick={startGame}>PLAY</button>
+            <button onClick={stopGame}>STOP</button>
         </div>
     )
 }

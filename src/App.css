@@ -4,7 +4,7 @@
     display: grid;
     justify-items: stretch;
     height: 100svh;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 2fr 2fr 1fr;
 }
 
 .gridElement {
