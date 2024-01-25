@@ -1,5 +1,6 @@
 import Personaje from './Personaje';
 import AtaqueEnemigo from './Enemigo';
+import WoodenStick from "./WoodenStick";
 import { useState, useEffect, useRef } from "react";
 
 function GridElementPersonaje({ personajeOnOff }) {
@@ -24,9 +25,13 @@ function GridElementAir({ ataqueEnemigoOnOff }) {
 function Grid() {
     let gridElementPersonajeArray = [];
     let gridElementAirArray = [];
-    const gridTemplateColumnsNumber = 3;
+    const gridTemplateColumnsNumber = 5;
+
+    const [direccionMirada, setDireccionMirada] = useState("scaleX(-1)");
     
-    const personajeOn = <Personaje />;
+    const personajeOn = 
+        <Personaje 
+            handleDireccionMirada={direccionMirada} />;
     let personajeOff = null;
 
     let ataqueEnemigoOff = null;
@@ -38,14 +43,38 @@ function Grid() {
         return Math.floor(Math.random() * max);
     }
 
-    /*Posicion de el personaje y los ataques*/
+    function getRandomIntWoodenStick(max, personajePosition) {
+        let resultado;
+        resultado = Math.floor(Math.random() * max);
+
+        while (resultado === personajePosition) {
+            resultado = Math.floor(Math.random() * max);
+        }
+        
+        return resultado;
+    }
+
+    /*
+    Posicion de el 
+        - personaje, 
+        - los ataques y
+        - Wooden Stick
+    */
 
     const [
         gridElementPersonajePosition, 
         setGridElementPersonajePosition] = useState(0);
     const [
         gridElementAirAtaqueEnemigoPosition, 
-        setGridElementAirAtaqueEnemigoPosition] = useState(null)
+        setGridElementAirAtaqueEnemigoPosition] = useState(null);
+    
+    const [
+        gridElementWoodenStickPosition,
+        setGridElementWoodenStickPosition] = useState(
+            getRandomIntWoodenStick(
+                gridTemplateColumnsNumber, 
+                gridElementPersonajePosition)
+    );
 
     /*Movimiento del personaje con las flechas del teclado*/
 
@@ -53,11 +82,13 @@ function Grid() {
         if(event.key === 'ArrowRight') {
             if (gridElementPersonajePosition + 1 < gridTemplateColumnsNumber) {
                 setGridElementPersonajePosition(gridElementPersonajePosition + 1);
+                setDireccionMirada("scaleX(-1)");
             }
         }
         if(event.key === 'ArrowLeft') {
             if (gridElementPersonajePosition > 0) {
                 setGridElementPersonajePosition(gridElementPersonajePosition - 1);
+                setDireccionMirada("scaleX(1)");
             }
         }
     }
@@ -65,15 +96,28 @@ function Grid() {
     /*Numero de columnas*/
 
     for (let i = 0; i < gridTemplateColumnsNumber; i++) {
+
+        /* Grid del cielo */
+        /*Personaje*/
+
         if (i === gridElementPersonajePosition) {
             gridElementPersonajeArray.push(
                 <GridElementPersonaje personajeOnOff={personajeOn} />
             );
+        } else if (i === gridElementWoodenStickPosition) {
+            gridElementPersonajeArray.push(<WoodenStick />)
         } else {
             gridElementPersonajeArray.push(
                 <GridElementPersonaje personajeOnOff={personajeOff} />
             );
         }
+
+        /*Wooden Stick*/
+
+        
+
+        /*Grid del Aire*/
+
         if (i === gridElementAirAtaqueEnemigoPosition) {
             gridElementAirArray.push(
                 <GridElementAir ataqueEnemigoOnOff={ataqueEnemigoOn} />
@@ -124,33 +168,37 @@ function Grid() {
 
     useEffect(() => {
         if (gridElementAirAtaqueEnemigoPosition === gridElementPersonajePosition) {
-            console.log("flecha en posición");
-
             timeoutAtaqueEnemigo = setTimeout(() => {
                 if (gridElementAirAtaqueEnemigoPosition === gridElementPersonajePosition) {
-                    console.log("flecha ha impactado");
-                    stopGame();
+                    /*stopGame();*/
                 }
             }, timerAtaqueEnemigoDuration);
         }
         return () => clearTimeout(timeoutAtaqueEnemigo);
 
-    }, [gridElementPersonajePosition, gridElementAirAtaqueEnemigoPosition])
+    }, [gridElementPersonajePosition, gridElementAirAtaqueEnemigoPosition]);
 
-    const gameStartRef = useRef(null)
+    const gameStartRef = useRef(null);
 
     function startGame() {
         gameStartRef.current.focus()
         setTimerAtaqueEnemigo(1);
-        console.log("start");
-    }
+    };
 
     function stopGame() {
         setTimerAtaqueEnemigo(0)
         setAtaqueEnemigoOn(<AtaqueEnemigo display={"none"} />);
         setGridElementAirAtaqueEnemigoPosition(null)
-        console.log("stop");
-    }
+    };
+
+    useEffect(() => {
+        console.log("Personaje: " + gridElementPersonajePosition)
+        console.log("Bolita: " + gridElementWoodenStickPosition);
+      if (gridElementPersonajePosition === gridElementWoodenStickPosition) {
+        setGridElementWoodenStickPosition(getRandomIntWoodenStick);
+      }
+    }, [gridElementPersonajePosition, gridElementWoodenStickPosition])
+    
 
     return (
         <div id='containerOfGrid'>
