@@ -1,6 +1,7 @@
 import Personaje from './Personaje';
 import AtaqueEnemigo from './Enemigo';
 import WoodenStick from "./WoodenStick";
+import Points from './Points';
 import { useState, useEffect, useRef } from "react";
 
 function GridElementPersonaje({ personajeOnOff }) {
@@ -28,20 +29,10 @@ function Grid() {
     const gridTemplateColumnsNumber = 5;
 
     const [direccionMirada, setDireccionMirada] = useState("scaleX(-1)");
-    
-    const personajeOn = 
-        <Personaje 
-            handleDireccionMirada={direccionMirada} />;
-    let personajeOff = null;
 
-    let ataqueEnemigoOff = null;
-    const [ataqueEnemigoOn, setAtaqueEnemigoOn] = useState(ataqueEnemigoOff);
+
 
     /*Generador de numeros aleatorios con un tope maximo*/
-
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
 
     function getRandomIntWoodenStick(max, personajePosition) {
         let resultado;
@@ -75,6 +66,37 @@ function Grid() {
                 gridTemplateColumnsNumber, 
                 gridElementPersonajePosition)
     );
+
+    const personajeOn = 
+        <Personaje 
+            handleDireccionMirada={direccionMirada} />;
+    let personajeOff = null;
+
+    let ataqueEnemigoOff = null;
+    const [ataqueEnemigoOn, setAtaqueEnemigoOn] = useState(ataqueEnemigoOff);
+
+    /*Posicion aleatoria de los Wooden Stick*/
+
+    /* --- puntos --- */
+
+    const [points, setPoints] = useState(0);
+
+    /* --- Velocidad de Ataque enemigo */
+    
+    const timerAtaqueEnemigoDurationFacil = 1000
+    const [timerAtaqueEnemigoDuration, setTimerAtaqueEnemigoDuration] = useState(timerAtaqueEnemigoDurationFacil);
+
+    /* --- posicion aleatoria --- */
+
+    useEffect(() => {
+        if (gridElementPersonajePosition === gridElementWoodenStickPosition) {
+            setGridElementWoodenStickPosition(getRandomIntWoodenStick(
+                gridTemplateColumnsNumber, 
+                gridElementPersonajePosition));
+            setPoints(points + 1);
+            setTimerAtaqueEnemigoDuration(timerAtaqueEnemigoDuration - 50);
+        }
+      }, [gridElementPersonajePosition, gridElementWoodenStickPosition])
 
     /*Movimiento del personaje con las flechas del teclado*/
 
@@ -146,8 +168,6 @@ function Grid() {
     const [timerAtaqueEnemigo, setTimerAtaqueEnemigo] = useState(0);
 
     let intervalTimerAtaqueEnemigo;
-    
-    const [timerAtaqueEnemigoDuration, setTimerAtaqueEnemigoDuration] = useState(1000);
 
     useEffect(() => {
         if (timerAtaqueEnemigo === 1) {
@@ -157,7 +177,7 @@ function Grid() {
                     animationName={"ataqueEnemigoUp"}
                     animationDuration={`${timerAtaqueEnemigoDuration}ms`} />);
                 setGridElementAirAtaqueEnemigoPosition(
-                    getRandomInt(gridTemplateColumnsNumber)
+                    getRandomIntWoodenStick(gridTemplateColumnsNumber, gridElementAirAtaqueEnemigoPosition)
                 );
             }, timerAtaqueEnemigoDuration);
             return () => clearInterval(intervalTimerAtaqueEnemigo);
@@ -170,7 +190,7 @@ function Grid() {
         if (gridElementAirAtaqueEnemigoPosition === gridElementPersonajePosition) {
             timeoutAtaqueEnemigo = setTimeout(() => {
                 if (gridElementAirAtaqueEnemigoPosition === gridElementPersonajePosition) {
-                    /*stopGame();*/
+                    stopGame();
                 }
             }, timerAtaqueEnemigoDuration);
         }
@@ -178,11 +198,10 @@ function Grid() {
 
     }, [gridElementPersonajePosition, gridElementAirAtaqueEnemigoPosition]);
 
-    const gameStartRef = useRef(null);
-
     function startGame() {
-        gameStartRef.current.focus()
         setTimerAtaqueEnemigo(1);
+        setPoints(0);
+        setTimerAtaqueEnemigoDuration(timerAtaqueEnemigoDurationFacil);
     };
 
     function stopGame() {
@@ -191,20 +210,27 @@ function Grid() {
         setGridElementAirAtaqueEnemigoPosition(null)
     };
 
+    const gameStartRef = useRef(null);
+    const playButtonRef = useRef();
+
     useEffect(() => {
-        console.log("Personaje: " + gridElementPersonajePosition)
-        console.log("Bolita: " + gridElementWoodenStickPosition);
-      if (gridElementPersonajePosition === gridElementWoodenStickPosition) {
-        setGridElementWoodenStickPosition(getRandomIntWoodenStick);
+      if (timerAtaqueEnemigo === 0) {
+        playButtonRef.current.focus();
+      } else if (timerAtaqueEnemigo === 1) {
+        gameStartRef.current.focus();
       }
-    }, [gridElementPersonajePosition, gridElementWoodenStickPosition])
-    
+    }, [timerAtaqueEnemigo])    
 
     return (
         <div id='containerOfGrid'>
             { 
                 timerAtaqueEnemigo === 0 ? 
-                    <button onClick={startGame} id='playButton' className='fullScreen'>PLAY</button> 
+                    <button 
+                        ref={playButtonRef} 
+                        onClick={startGame} 
+                        id='playButton' 
+                        className='fullScreen'
+                        style={{fontSize: "5rem"}}>PLAY</button> 
                 : null 
             }
             <div 
@@ -216,6 +242,7 @@ function Grid() {
                     {gridElementPersonajeArray}
                     {gridElementAirArray}
             </div>
+            { timerAtaqueEnemigo === 1 ? <Points puntos={points} /> : null }
         </div>
     )
 }

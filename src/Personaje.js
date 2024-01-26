@@ -1,6 +1,6 @@
 import personajeImg from "./img/4_Vulture/Vulture_walk.png";
 
-function Personaje({ handleDireccionMirada}) {
+function Personaje({ handleDireccionMirada }) {
     return (
       <div 
         className="Personaje-img"
